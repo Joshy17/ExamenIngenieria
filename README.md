@@ -355,6 +355,52 @@ function testGetUserDetails() {
 
    * Finalmente, se verifica que el resultado de la acción sea el esperado. En este caso, se asegura que el nombre del usuario haya sido actualizado correctamente y que la consulta retorne los detalles esperados.
 
+### Fitness Function: Evaluación del Command Handler y Query Handler de Usuarios
+
+#### **¿Qué?**
+
+La eficiencia y efectividad del **Command Handler** y **Query Handler** para manejar las solicitudes de actualización de datos y consulta de usuarios en el sistema, midiendo:
+
+* **Tiempo de ejecución del Command Handler** (latencia para actualizar un usuario).
+* **Tiempo de ejecución del Query Handler** (latencia para consultar los detalles de un usuario).
+* **Tasa de éxito de las operaciones** (porcentaje de actualizaciones y consultas exitosas).
+* **Completitud y consistencia de los datos** (validar que el usuario haya sido actualizado correctamente o que los datos consultados sean correctos).
+* **Escalabilidad** bajo carga de múltiples solicitudes (concurrencia de solicitudes de actualización o consulta).
+
+#### **¿Cómo?**
+
+Mediante pruebas de rendimiento y validación de lógica de negocio con herramientas automatizadas como **JUnit**, **Mockito**, o herramientas de prueba de rendimiento como **k6** y **Apache JMeter**, considerando lo siguiente:
+
+##### **Métricas recolectadas**:
+
+* **Tiempo de respuesta promedio** (`avg_response_time`) para manejar las solicitudes de actualización y consulta.
+* **Tiempo máximo de respuesta** (`max_response_time`) para manejar las solicitudes de actualización y consulta.
+* **Porcentaje de errores** (`error_rate`), que mide las respuestas no exitosas en el proceso de actualización de datos o consulta de detalles.
+* **Completitud de la actualización**: Verificar que el nombre del usuario se haya actualizado correctamente.
+* **Consistencia de los datos**: Validar que los detalles del usuario sean correctos en cada consulta.
+
+##### **Escenarios de prueba**:
+
+* **Comando de actualización de usuario**:
+
+  * Actualización de un único usuario con datos válidos.
+  * Prueba con un nombre de usuario inválido o no encontrado.
+  * Prueba de latencia para actualizar un nombre bajo carga simultánea (e.g., 10, 100, 500 actualizaciones simultáneas).
+* **Consulta de detalles del usuario**:
+
+  * Consulta exitosa de los detalles de un usuario por ID.
+  * Consulta de un usuario que no existe (debería devolver un error o un valor nulo).
+  * Evaluación de la latencia para las consultas bajo carga de múltiples solicitudes simultáneas.
+  * Verificar que la respuesta del `Query Handler` sea consistente y precisa, garantizando que los datos devueltos corresponden con los almacenados en el sistema.
+
+#### **¿Cuándo?**
+
+* Durante las **pruebas de rendimiento** de la aplicación, antes del despliegue en producción (pruebas prerelease).
+* En cada **integración continua (CI/CD)** para detectar cualquier **regresión** en el rendimiento del **Command Handler** o **Query Handler**.
+* Después de cada **refactorización** o cambio importante en la capa de persistencia de datos o lógica de negocio.
+* Durante las **pruebas de estrés** para evaluar la capacidad del sistema bajo carga y garantizar que la aplicación pueda manejar múltiples solicitudes concurrentes de actualización o consulta sin degradación significativa del rendimiento.
+
+
 
 
 
