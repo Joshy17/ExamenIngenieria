@@ -1,7 +1,5 @@
 # ExamenIngenieria
 
-Aquí tienes un resumen de los temas que mencionaste:
-
 ### ADR (Architecture Decision Records)
 
 * **Qué son**: Son registros documentales que capturan decisiones importantes de arquitectura, su contexto, intención y consecuencias.
