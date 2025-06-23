@@ -297,7 +297,7 @@ class GetUserDetailsHandler {
 
 #### Prueba unitaria para el **Command Handler** (`UpdateUserNameHandler`)
 
-```plaintext
+```java
 // Prueba para el Command Handler UpdateUserNameHandler
 function testUpdateUserName() {
     // Arrange: Preparar los objetos necesarios
