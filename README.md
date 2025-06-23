@@ -197,11 +197,165 @@ public class SecurityFitnessFunction {
 
 ---
 
-### Conclusión
+## Ejemplo (Pseucodocodigo)
 
-* **ADR**: Es una herramienta poderosa para mantener un registro de las decisiones arquitectónicas, documentando su contexto, las decisiones tomadas y las consecuencias. Te permite gestionar el cambio de forma estructurada.
-* **Fitness Functions**: Son funciones automatizadas que aseguran que tu sistema cumpla con ciertos criterios de calidad, como rendimiento, seguridad, escalabilidad, etc. Estas funciones son esenciales para mantener la salud de la arquitectura en sistemas complejos y en evolución.
+### Historia de Usuario: Manejo de Información del Usuario
 
-Si necesitas ejemplos más específicos o ajustes, no dudes en pedírmelo.
+#### Como **usuario administrador** del sistema,
+
+Quiero poder **actualizar el nombre de los usuarios** y **consultar los detalles de un usuario**,
+
+Para poder **mantener actualizada la información personal de los usuarios** y **verificar sus datos cuando sea necesario**.
+
+---
+
+### **Criterios de Aceptación**:
+
+1. **Actualizar el nombre de usuario**:
+
+   * El sistema debe permitir que un administrador actualice el nombre de un usuario.
+   * El nombre del usuario debe ser actualizado correctamente en la base de datos.
+   * El sistema debe verificar que el usuario existe antes de intentar actualizar los datos.
+   * Si el usuario no existe, el sistema debe manejar el error de forma adecuada.
+
+2. **Obtener los detalles de un usuario**:
+
+   * El sistema debe permitir que un administrador consulte los detalles de un usuario usando su `userId`.
+   * El sistema debe devolver la información completa del usuario (por ejemplo, `userId`, `name`, etc.).
+   * Si el usuario no existe, el sistema debe manejar el error de forma adecuada.
+
+---
+
+### **Historias de Usuario en el código**:
+
+El **Command Handler** y el **Query Handler** que definimos están directamente relacionados con las funcionalidades de la historia de usuario. Aquí es como se alinea:
+
+* **Comando de Actualización de Usuario** (`UpdateUserNameHandler`): Permite al administrador actualizar el nombre de un usuario. Este es el comportamiento esperado de la funcionalidad de "Actualizar el nombre de usuario".
+
+* **Consulta de Usuario** (`GetUserDetailsHandler`): Permite al administrador consultar la información del usuario (como su nombre y `userId`). Esta funcionalidad corresponde a la parte de "Obtener los detalles de un usuario".
+
+### **En términos de pruebas**:
+
+* Las pruebas unitarias que escribimos validan que la **actualización de datos** y la **consulta de datos** funcionan correctamente. Estas pruebas aseguran que las funcionalidades del sistema están implementadas correctamente y que el sistema reacciona de manera adecuada ante situaciones como cambios de datos o consultas incorrectas.
+
+---
+
+### Ejemplo en pseudocódigo
+
+#### 1. **Command Handler** (Manejo de Comandos)
+
+El **Command Handler** maneja una acción que cambia el estado de la aplicación.
+
+```plaintext
+// Command: Actualizar nombre de usuario
+class UpdateUserNameCommand {
+    constructor(userId, newUserName) {
+        this.userId = userId;
+        this.newUserName = newUserName;
+    }
+}
+
+// Command Handler
+class UpdateUserNameHandler {
+    constructor(userRepository) {
+        this.userRepository = userRepository;  // Repositorio que accede a los datos
+    }
+
+    handle(command) {
+        let user = this.userRepository.findUserById(command.userId);
+        if (user) {
+            user.name = command.newUserName;
+            this.userRepository.save(user);  // Guardar cambios
+        }
+    }
+}
+```
+
+#### 2. **Query Handler** (Manejo de Consultas)
+
+El **Query Handler** maneja una consulta que solo lee datos sin cambiar el estado de la aplicación. Aquí crearemos uno para obtener los detalles de un usuario por su ID.
+
+```plaintext
+// Query: Obtener detalles de un usuario
+class GetUserDetailsQuery {
+    constructor(userId) {
+        this.userId = userId;
+    }
+}
+
+// Query Handler
+class GetUserDetailsHandler {
+    constructor(userRepository) {
+        this.userRepository = userRepository;  // Repositorio que accede a los datos
+    }
+
+    handle(query) {
+        return this.userRepository.findUserById(query.userId);
+    }
+}
+```
+
+### 3. **Pruebas Unitarias** (usando el patrón Arrange, Act, Assert)
+
+#### Prueba unitaria para el **Command Handler** (`UpdateUserNameHandler`)
+
+```plaintext
+// Prueba para el Command Handler UpdateUserNameHandler
+function testUpdateUserName() {
+    // Arrange: Preparar los objetos necesarios
+    let userRepository = new InMemoryUserRepository(); // Usamos un repositorio en memoria para pruebas
+    let handler = new UpdateUserNameHandler(userRepository);
+    let user = new User(1, "Juan");  // Crear un usuario de prueba
+    userRepository.save(user);  // Guardar el usuario en el repositorio en memoria
+    let command = new UpdateUserNameCommand(1, "Carlos");  // Crear el comando para actualizar el nombre
+
+    // Act: Ejecutar la acción
+    handler.handle(command);  // Llamar al handler para procesar el comando
+
+    // Assert: Verificar que el estado ha cambiado correctamente
+    let updatedUser = userRepository.findUserById(1);
+    assert(updatedUser.name === "Carlos", "El nombre del usuario no se actualizó correctamente.");
+}
+```
+
+#### Prueba unitaria para el **Query Handler** (`GetUserDetailsHandler`)
+
+Aquí tenemos la prueba unitaria para asegurarnos de que el **GetUserDetailsHandler** retorna correctamente los detalles de un usuario.
+
+```plaintext
+// Prueba para el Query Handler GetUserDetailsHandler
+function testGetUserDetails() {
+    // Arrange: Preparar los objetos necesarios
+    let userRepository = new InMemoryUserRepository(); // Usamos un repositorio en memoria para pruebas
+    let handler = new GetUserDetailsHandler(userRepository);
+    let user = new User(1, "Carlos");  // Crear un usuario de prueba
+    userRepository.save(user);  // Guardar el usuario en el repositorio en memoria
+    let query = new GetUserDetailsQuery(1);  // Crear la consulta para obtener detalles del usuario
+
+    // Act: Ejecutar la consulta
+    let result = handler.handle(query);  // Llamar al handler para obtener los detalles del usuario
+
+    // Assert: Verificar que el resultado es correcto
+    assert(result.name === "Carlos", "El nombre del usuario no es el esperado.");
+    assert(result.id === 1, "El ID del usuario no es el esperado.");
+}
+```
+
+### Explicación del **Patrón Arrange, Act, Assert**:
+
+1. **Arrange (Preparar)**:
+
+   * Aquí se preparan todas las dependencias necesarias y el entorno de prueba. En los ejemplos anteriores, creamos instancias de `userRepository`, `handler`, y los datos de prueba (como el `User` y el `UpdateUserNameCommand`).
+
+2. **Act (Ejecutar)**:
+
+   * En esta etapa, se ejecuta la acción o el comportamiento que estamos probando. Llamamos al `handler.handle(command)` o `handler.handle(query)` para realizar la operación de cambio de estado o consulta.
+
+3. **Assert (Verificar)**:
+
+   * Finalmente, se verifica que el resultado de la acción sea el esperado. En este caso, se asegura que el nombre del usuario haya sido actualizado correctamente y que la consulta retorne los detalles esperados.
+
+
+
 
 
