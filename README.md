@@ -244,7 +244,7 @@ El **Command Handler** y el **Query Handler** que definimos están directamente 
 
 El **Command Handler** maneja una acción que cambia el estado de la aplicación.
 
-```plaintext
+```java
 // Command: Actualizar nombre de usuario
 class UpdateUserNameCommand {
     constructor(userId, newUserName) {
@@ -273,7 +273,7 @@ class UpdateUserNameHandler {
 
 El **Query Handler** maneja una consulta que solo lee datos sin cambiar el estado de la aplicación. Aquí crearemos uno para obtener los detalles de un usuario por su ID.
 
-```plaintext
+```java
 // Query: Obtener detalles de un usuario
 class GetUserDetailsQuery {
     constructor(userId) {
@@ -320,7 +320,7 @@ function testUpdateUserName() {
 
 Aquí tenemos la prueba unitaria para asegurarnos de que el **GetUserDetailsHandler** retorna correctamente los detalles de un usuario.
 
-```plaintext
+```java
 // Prueba para el Query Handler GetUserDetailsHandler
 function testGetUserDetails() {
     // Arrange: Preparar los objetos necesarios
